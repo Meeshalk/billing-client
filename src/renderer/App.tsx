@@ -1,50 +1,47 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
-import './App.css';
+import React, { useReducer } from 'react';
+import AuthContext from './Context/AuthContext';
+import { AuthState, Action } from './Types/DataTypes';
 
-const Hello = () => {
-  return (
-    <div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="folded hands">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
-    </div>
-  );
+import './App.css';
+import HomeScreen from './screens/HomeScreen';
+import Login from './Login/Login';
+
+const initialState: AuthState = {
+  isAuthenticated: false,
+  user: {},
+  token: '',
 };
 
-export default function App() {
+const reducer = (state: AuthState, action: Action): AuthState => {
+  switch (action.type) {
+    case 'login':
+      localStorage.setItem('user', JSON.stringify(action.payload.user));
+      localStorage.setItem('token', JSON.stringify(action.payload.token));
+      return {
+        ...state,
+        isAuthenticated: true,
+        user: action.payload.user,
+        token: action.payload.token,
+      };
+    case 'logout':
+      localStorage.clear();
+      return {
+        ...state,
+        isAuthenticated: false,
+        user: {},
+      };
+    default:
+      return state;
+  }
+};
+
+function App() {
+  const [state, dispatch] = useReducer(reducer, initialState);
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
+    <AuthContext.Provider value={{ state, dispatch }}>
+      {state.isAuthenticated ? <HomeScreen /> : <Login />}
+    </AuthContext.Provider>
   );
 }
+
+export default App;

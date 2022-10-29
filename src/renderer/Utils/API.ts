@@ -1,16 +1,4 @@
-import { URL } from 'url';
-import path from 'path';
 import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
-
-export function resolveHtmlPath(htmlFileName: string) {
-  if (process.env.NODE_ENV === 'development') {
-    const port = process.env.PORT || 1212;
-    const url = new URL(`http://localhost:${port}`);
-    url.pathname = htmlFileName;
-    return url.href;
-  }
-  return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
-}
 
 const defaultHeaders: AxiosRequestHeaders = {
   Authorization: '',
@@ -24,8 +12,8 @@ const axiosConfig: AxiosRequestConfig = {
   method: 'post',
   data: {},
   baseURL: 'http://billing-server-app.test/api/',
-  // httpAgent: 'billing-client-electron-version',
-  // httpsAgent: 'billing-client-electron-version-secure',
+  httpAgent: 'billing-client-electron-version',
+  httpsAgent: 'billing-client-electron-version-secure',
 };
 
 async function getAuthBearer() {
@@ -38,8 +26,8 @@ async function getAuthBearer() {
   return false;
 }
 
-export async function makeRequest(data, url, method = 'get') {
-  if (url !== 'login') {
+async function makeRequest(data, url, method = 'get') {
+  if (url !== '/login') {
     const token = await getAuthBearer();
     axiosConfig.headers.Authorization = token || '';
   }
@@ -66,25 +54,25 @@ export async function makeRequest(data, url, method = 'get') {
   try {
     response = await axios(axiosConfig);
   } catch (error) {
-    response = error.response.data;
+    response = error.response;
   }
 
-  if (response.status === 200) {
+  // eslint-disable-next-line eqeqeq
+  if (response.status == 200) {
     return response.data;
   }
 
   return false;
 }
 
-export async function login(username, password, deviceName) {
+async function login(username, password, deviceName) {
   const data = {
     username,
     password,
     device_name: deviceName,
   };
-  try {
-    return await makeRequest(data, 'login', 'post');
-  } catch (error) {
-    return false;
-  }
+  const response = await makeRequest(data, '/login', 'post');
+  return response;
 }
+
+export default { login, makeRequest };

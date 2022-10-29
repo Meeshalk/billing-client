@@ -6,17 +6,16 @@ body {
   position: relative;
   color: white;
   height: 100vh;
+  background: rgb(33, 28, 2);
   background: linear-gradient(
-    200.96deg,
-    #fedc2a -29.09%,
-    #dd5789 51.77%,
-    #7a2c9e 129.35%
+    180deg,
+    rgb(19, 16, 0) 65%,
+    rgba(59, 5, 24, 1) 125%,
+    rgba(42, 2, 60, 1) 125%
   );
   font-family: sans-serif;
   overflow-y: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block;
 }
 
 button {
@@ -47,6 +46,7 @@ a {
   height: fit-content;
   width: fit-content;
   margin: 10px;
+  color: white;
 }
 
 a:hover {
@@ -59,4 +59,77 @@ a:hover {
   justify-content: center;
   align-items: center;
   margin: 20px 0;
+}
+
+.Login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-container form > * {
+  display: block;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+input,
+select {
+  outline: none;
+}
+
+form > input,
+form > button,
+form > select {
+  padding: 0.5em;
+  border-radius: 0.4em;
+  font-size: 1.3rem;
+  width: -webkit-fill-available;
+}
+
+.login-container form > h2,
+.login-container form > h1,
+.login-container form > button {
+  text-align: center;
+}
+
+.formButtons {
+  display: flex !important;
+  justify-content: center;
+}
+
+.home-container {
+  padding: 0.5em;
+  padding-top: 1em;
+
+  display: flex;
+}
+
+.home-container form {
+  width: -webkit-fill-available;
+  display: flex;
+  justify-content: space-between;
+}
+
+.home-container form {
+  width: -webkit-fill-available;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.home-container form input,
+.home-container form div {
+  width: auto;
+}
+
+.form-error {
+  color: rgb(223, 69, 69);
 }

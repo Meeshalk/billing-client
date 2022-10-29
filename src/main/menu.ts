@@ -56,11 +56,6 @@ export default class MenuBuilder {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
       label: 'Electron',
       submenu: [
-        {
-          label: 'About ElectronReact',
-          selector: 'orderFrontStandardAboutPanel:',
-        },
-        { type: 'separator' },
         { label: 'Services', submenu: [] },
         { type: 'separator' },
         {
@@ -155,31 +150,32 @@ export default class MenuBuilder {
       label: 'Help',
       submenu: [
         {
-          label: 'Learn More',
+          label: 'About',
           click() {
             shell.openExternal('https://electronjs.org');
           },
         },
+        { type: 'separator' },
         {
-          label: 'Documentation',
+          label: 'Contact Support',
           click() {
             shell.openExternal(
               'https://github.com/electron/electron/tree/main/docs#readme'
             );
           },
         },
-        {
-          label: 'Community Discussions',
-          click() {
-            shell.openExternal('https://www.electronjs.org/community');
-          },
-        },
-        {
-          label: 'Search Issues',
-          click() {
-            shell.openExternal('https://github.com/electron/electron/issues');
-          },
-        },
+        // {
+        //   label: 'Community Discussions',
+        //   click() {
+        //     shell.openExternal('https://www.electronjs.org/community');
+        //   },
+        // },
+        // {
+        //   label: 'Search Issues',
+        //   click() {
+        //     shell.openExternal('https://github.com/electron/electron/issues');
+        //   },
+        // },
       ],
     };
 
@@ -197,10 +193,10 @@ export default class MenuBuilder {
       {
         label: '&File',
         submenu: [
-          {
-            label: '&Open',
-            accelerator: 'Ctrl+O',
-          },
+          // {
+          //   label: '&Open',
+          //   accelerator: 'Ctrl+O',
+          // },
           {
             label: '&Close',
             accelerator: 'Ctrl+W',
@@ -256,29 +252,17 @@ export default class MenuBuilder {
         label: 'Help',
         submenu: [
           {
-            label: 'Learn More',
+            label: 'About',
             click() {
               shell.openExternal('https://electronjs.org');
             },
           },
           {
-            label: 'Documentation',
+            label: 'Contact Support',
             click() {
               shell.openExternal(
                 'https://github.com/electron/electron/tree/main/docs#readme'
               );
-            },
-          },
-          {
-            label: 'Community Discussions',
-            click() {
-              shell.openExternal('https://www.electronjs.org/community');
-            },
-          },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/electron/electron/issues');
             },
           },
         ],

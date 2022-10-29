@@ -1,4 +1,4 @@
-/* eslint global-require: off, no-console: off, promise/always-return: off */
+/* eslint global-require: off, promise/always-return: off */
 
 /**
  * This module executes inside of electron's main process. You can start
@@ -12,8 +12,9 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { LoginFormState } from '../renderer/Types/DataTypes';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import { resolveHtmlPath, login } from './util';
 
 class AppUpdater {
   constructor() {
@@ -25,10 +26,18 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+ipcMain.handle('login', async (event, input: LoginFormState) => {
+  try {
+    const data = await login(input.email, input.password, input.device_name);
+
+    return data;
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -103,8 +112,8 @@ const createWindow = async () => {
   menuBuilder.buildMenu();
 
   // Open urls in the user's browser
-  mainWindow.webContents.setWindowOpenHandler((edata) => {
-    shell.openExternal(edata.url);
+  mainWindow.webContents.setWindowOpenHandler((winData) => {
+    shell.openExternal(winData.url);
     return { action: 'deny' };
   });
 
@@ -135,4 +144,6 @@ app
       if (mainWindow === null) createWindow();
     });
   })
-  .catch(console.log);
+  .catch((error) => {
+    // TODO: log error
+  });
