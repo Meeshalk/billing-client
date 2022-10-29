@@ -3,8 +3,8 @@ import AuthContext from './Context/AuthContext';
 import { AuthState, Action, User } from './Types/DataTypes';
 
 import './App.css';
-import HomeScreen from './screens/HomeScreen';
 import Login from './Login/Login';
+import Home from './Home/Home';
 
 const initialState: AuthState = {
   isAuthenticated: false,
@@ -67,7 +67,7 @@ function App() {
   }
   return (
     <AuthContext.Provider value={{ state, dispatch }}>
-      {state.isAuthenticated ? <HomeScreen /> : <Login />}
+      {state.isAuthenticated ? <Home /> : <Login />}
     </AuthContext.Provider>
   );
 }
