@@ -34,10 +34,12 @@ const Login = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
+    let errors = [];
+    let isSubmitting = true;
     setLoginFormData({
       ...loginFormData,
-      isSubmitting: true,
-      errorMessage: [],
+      isSubmitting,
+      errorMessage: errors,
     });
 
     const data = await window['billing-app'].ipcRenderer.invoke(
@@ -46,12 +48,8 @@ const Login = () => {
     );
 
     if (data.status === 'error') {
-      const messages = convertErrorsToArray(data.message);
-      setLoginFormData({
-        ...loginFormData,
-        isSubmitting: false,
-        errorMessage: messages,
-      });
+      errors = convertErrorsToArray(data.message);
+      isSubmitting = false;
     }
 
     if (data.status === 'success') {
@@ -66,7 +64,8 @@ const Login = () => {
 
     setLoginFormData({
       ...loginFormData,
-      isSubmitting: false,
+      isSubmitting,
+      errorMessage: errors,
     });
   };
 
@@ -107,17 +106,6 @@ const Login = () => {
                 <option>Device 1</option>
               </select>
 
-              {loginFormData.errorMessage.length > 0 && (
-                <span className="form-error">
-                  <p>Errors:</p>
-                  <ul>
-                    {loginFormData.errorMessage.map((error, index) => (
-                      <li key={index}>{error}</li>
-                    ))}
-                  </ul>
-                </span>
-              )}
-
               <div id="loginSubmit" className="formButtons">
                 <button type="submit" disabled={loginFormData.isSubmitting}>
                   {loginFormData.isSubmitting ? (
@@ -127,6 +115,17 @@ const Login = () => {
                   )}
                 </button>
               </div>
+
+              {loginFormData.errorMessage.length > 0 && (
+                <span className="form-error">
+                  <p style={{ textAlign: 'center' }}>Input Errors</p>
+                  <ul>
+                    {loginFormData.errorMessage.map((error, index) => (
+                      <li key={index}>{error}</li>
+                    ))}
+                  </ul>
+                </span>
+              )}
             </form>
           </div>
         </div>

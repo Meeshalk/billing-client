@@ -65,15 +65,12 @@ export async function makeRequest(data, url, method = 'get') {
   let response = null;
   try {
     response = await axios(axiosConfig);
+    response = response.data;
   } catch (error) {
     response = error.response.data;
   }
 
-  if (response.status === 200) {
-    return response.data;
-  }
-
-  return false;
+  return response;
 }
 
 export async function login(username, password, deviceName) {
