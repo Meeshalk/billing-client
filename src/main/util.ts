@@ -2,7 +2,7 @@ import { URL } from 'url';
 import path from 'path';
 import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 
-export function resolveHtmlPath(htmlFileName: string) {
+function resolveHtmlPath(htmlFileName: string) {
   if (process.env.NODE_ENV === 'development') {
     const port = process.env.PORT || 1212;
     const url = new URL(`http://localhost:${port}`);
@@ -65,7 +65,7 @@ export async function makeRequest(data, url, method = 'get', token = null) {
   return response;
 }
 
-export async function login(username, password, deviceName) {
+async function login(username, password, deviceName) {
   const data = {
     username,
     password,
@@ -78,7 +78,16 @@ export async function login(username, password, deviceName) {
   }
 }
 
-export async function getDevices() {
+async function logout(token: string) {
+  try {
+    return await makeRequest({}, 'logout', 'post', token);
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+async function getDevices() {
   try {
     return await makeRequest({}, 'device', 'get');
   } catch (error) {
@@ -86,3 +95,5 @@ export async function getDevices() {
     return false;
   }
 }
+
+export { resolveHtmlPath, getDevices, login, logout };

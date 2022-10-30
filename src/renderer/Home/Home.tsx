@@ -8,14 +8,24 @@ function Home() {
     user: state.user,
   };
 
-  const handleLogout = (event) => {
+  const initRequestState = {
+    token: state.token,
+  };
+
+  const handleLogout = async (event) => {
     event.preventDefault();
 
-    // call logout
-    dispatch({
-      type: 'logout',
-      payload: initialLogoutState,
-    });
+    const logout = await window['billing-app'].ipcRenderer.invoke(
+      'logout',
+      initRequestState
+    );
+
+    if (logout.status === 'success') {
+      dispatch({
+        type: 'logout',
+        payload: initialLogoutState,
+      });
+    }
   };
 
   const handleNewBill = (event) => {

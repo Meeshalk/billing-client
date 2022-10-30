@@ -14,7 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { LoginFormState } from '../renderer/Types/DataTypes';
 import MenuBuilder from './menu';
-import { resolveHtmlPath, login, getDevices } from './util';
+import { getDevices, login, logout, resolveHtmlPath } from './util';
 
 class AppUpdater {
   constructor() {
@@ -47,6 +47,18 @@ ipcMain.handle('login', async (event, input: LoginFormState) => {
 ipcMain.handle('get-devices', async (event, input) => {
   try {
     return await getDevices();
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+ipcMain.handle('logout', async (event, input) => {
+  try {
+    return await logout(input.token);
   } catch (error) {
     // TODO: log error
     return {
