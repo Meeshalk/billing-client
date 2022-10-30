@@ -16,6 +16,7 @@ body {
   font-family: sans-serif;
   overflow-y: hidden;
   display: block;
+  font-size: 1.1rem;
 }
 
 button {
@@ -92,7 +93,13 @@ form > select {
   padding: 0.5em;
   border-radius: 0.4em;
   font-size: 1.3rem;
-  width: -webkit-fill-available;
+  /* width: -webkit-fill-available; */
+}
+
+.login-container form > select,
+.login-container form > button,
+.login-container form > input {
+  width: -webkit-fill-available !important;
 }
 
 .login-container form > h2,
@@ -109,8 +116,8 @@ form > select {
 .home-container {
   padding: 0.5em;
   padding-top: 1em;
-
   display: flex;
+  flex-direction: column;
 }
 
 .home-container form {
@@ -119,17 +126,26 @@ form > select {
   justify-content: space-between;
 }
 
-.home-container form {
+/* .home-container form {
   width: -webkit-fill-available;
   display: flex;
   justify-content: space-evenly;
-}
+} */
 
-.home-container form input,
+/* .home-container form input,
 .home-container form div {
   width: auto;
-}
+} */
 
 .form-error {
   color: rgb(223, 69, 69);
+}
+
+.link-like-button {
+  background: none !important;
+  border: none;
+  padding: 0 !important;
+  cursor: pointer;
+  color: white;
+  font-size: 1.1rem;
 }

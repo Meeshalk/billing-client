@@ -28,20 +28,12 @@ const axiosConfig: AxiosRequestConfig = {
   // httpsAgent: 'billing-client-electron-version-secure',
 };
 
-async function getAuthBearer() {
-  const token = localStorage.getItem('token');
-
-  if (token?.length !== undefined && token?.length > 5) {
-    return `Bearer ${token}`;
-  }
-
-  return false;
-}
-
-export async function makeRequest(data, url, method = 'get') {
-  if (url !== 'login') {
-    const token = await getAuthBearer();
-    axiosConfig.headers.Authorization = token || '';
+export async function makeRequest(data, url, method = 'get', token = null) {
+  if (url !== 'login' && url !== 'device') {
+    if (token === null) {
+      throw new Error('Access token not found');
+    }
+    axiosConfig.headers.Authorization = `Bearer ${token}`;
   }
 
   if (data != null) {
@@ -82,6 +74,15 @@ export async function login(username, password, deviceName) {
   try {
     return await makeRequest(data, 'login', 'post');
   } catch (error) {
+    return false;
+  }
+}
+
+export async function getDevices() {
+  try {
+    return await makeRequest({}, 'device', 'get');
+  } catch (error) {
+    console.log(error);
     return false;
   }
 }
