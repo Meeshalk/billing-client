@@ -2,7 +2,7 @@ import { URL } from 'url';
 import path from 'path';
 import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 
-export function resolveHtmlPath(htmlFileName: string) {
+function resolveHtmlPath(htmlFileName: string) {
   if (process.env.NODE_ENV === 'development') {
     const port = process.env.PORT || 1212;
     const url = new URL(`http://localhost:${port}`);
@@ -28,20 +28,12 @@ const axiosConfig: AxiosRequestConfig = {
   // httpsAgent: 'billing-client-electron-version-secure',
 };
 
-async function getAuthBearer() {
-  const token = localStorage.getItem('token');
-
-  if (token?.length !== undefined && token?.length > 5) {
-    return `Bearer ${token}`;
-  }
-
-  return false;
-}
-
-export async function makeRequest(data, url, method = 'get') {
-  if (url !== 'login') {
-    const token = await getAuthBearer();
-    axiosConfig.headers.Authorization = token || '';
+export async function makeRequest(data, url, method = 'get', token = null) {
+  if (url !== 'login' && url !== 'device') {
+    if (token === null) {
+      throw new Error('Access token not found');
+    }
+    axiosConfig.headers.Authorization = `Bearer ${token}`;
   }
 
   if (data != null) {
@@ -65,18 +57,15 @@ export async function makeRequest(data, url, method = 'get') {
   let response = null;
   try {
     response = await axios(axiosConfig);
+    response = response.data;
   } catch (error) {
     response = error.response.data;
   }
 
-  if (response.status === 200) {
-    return response.data;
-  }
-
-  return false;
+  return response;
 }
 
-export async function login(username, password, deviceName) {
+async function login(username, password, deviceName) {
   const data = {
     username,
     password,
@@ -88,3 +77,23 @@ export async function login(username, password, deviceName) {
     return false;
   }
 }
+
+async function logout(token: string) {
+  try {
+    return await makeRequest({}, 'logout', 'post', token);
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+async function getDevices() {
+  try {
+    return await makeRequest({}, 'device', 'get');
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+export { resolveHtmlPath, getDevices, login, logout };

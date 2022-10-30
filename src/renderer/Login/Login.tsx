@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { LoginFormState } from '../Types/DataTypes';
 import AuthContext from '../Context/AuthContext';
 import logo from '../../assets/spinner.svg';
@@ -12,8 +12,7 @@ function convertErrorsToArray(errors): string[] {
 }
 
 const Login = () => {
-  const { dispatch } = React.useContext(AuthContext);
-  const initialLoginFormState: LoginFormState = {
+  const initialLoginState: LoginFormState = {
     email: '',
     password: '',
     device_name: '',
@@ -21,9 +20,28 @@ const Login = () => {
     errorMessage: [],
   };
 
-  const [loginFormData, setLoginFormData] = React.useState(
-    initialLoginFormState
-  );
+  const { dispatch } = React.useContext(AuthContext);
+  const [loginFormData, setLoginFormData] = React.useState(initialLoginState);
+  const [deviceList, setDeviceList] = React.useState([]);
+
+  const getAllDevices = async () => {
+    const response = await window['billing-app'].ipcRenderer.invoke(
+      'get-devices',
+      []
+    );
+
+    if (response.status === 'error') {
+      // log
+    }
+
+    if (response.status === 'success') {
+      setDeviceList(response.data);
+    }
+  };
+
+  useEffect(() => {
+    getAllDevices();
+  }, []);
 
   const handleInputChange = (event) => {
     setLoginFormData({
@@ -34,10 +52,12 @@ const Login = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
+    let errors = [];
+    let isSubmitting = true;
     setLoginFormData({
       ...loginFormData,
-      isSubmitting: true,
-      errorMessage: [],
+      isSubmitting,
+      errorMessage: errors,
     });
 
     const data = await window['billing-app'].ipcRenderer.invoke(
@@ -46,12 +66,8 @@ const Login = () => {
     );
 
     if (data.status === 'error') {
-      const messages = convertErrorsToArray(data.message);
-      setLoginFormData({
-        ...loginFormData,
-        isSubmitting: false,
-        errorMessage: messages,
-      });
+      errors = convertErrorsToArray(data.message);
+      isSubmitting = false;
     }
 
     if (data.status === 'success') {
@@ -66,7 +82,8 @@ const Login = () => {
 
     setLoginFormData({
       ...loginFormData,
-      isSubmitting: false,
+      isSubmitting,
+      errorMessage: errors,
     });
   };
 
@@ -104,19 +121,14 @@ const Login = () => {
                 onChange={handleInputChange}
               >
                 <option disabled>Select Device</option>
-                <option>Device 1</option>
-              </select>
 
-              {loginFormData.errorMessage.length > 0 && (
-                <span className="form-error">
-                  <p>Errors:</p>
-                  <ul>
-                    {loginFormData.errorMessage.map((error, index) => (
-                      <li key={index}>{error}</li>
-                    ))}
-                  </ul>
-                </span>
-              )}
+                {deviceList.length > 0 &&
+                  deviceList.map((device, index) => (
+                    <option key={index} value={device.name}>
+                      {device.name}
+                    </option>
+                  ))}
+              </select>
 
               <div id="loginSubmit" className="formButtons">
                 <button type="submit" disabled={loginFormData.isSubmitting}>
@@ -127,6 +139,17 @@ const Login = () => {
                   )}
                 </button>
               </div>
+
+              {loginFormData.errorMessage.length > 0 && (
+                <span className="form-error">
+                  <p style={{ textAlign: 'center' }}>Input Errors</p>
+                  <ul>
+                    {loginFormData.errorMessage.map((error, index) => (
+                      <li key={index}>{error}</li>
+                    ))}
+                  </ul>
+                </span>
+              )}
             </form>
           </div>
         </div>

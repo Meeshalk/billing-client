@@ -1,16 +1,26 @@
 import React, { useReducer } from 'react';
 import AuthContext from './Context/AuthContext';
-import { AuthState, Action } from './Types/DataTypes';
+import { AuthState, Action, User } from './Types/DataTypes';
 
 import './App.css';
-import HomeScreen from './screens/HomeScreen';
 import Login from './Login/Login';
+import Home from './Home/Home';
 
 const initialState: AuthState = {
   isAuthenticated: false,
   user: {},
   token: '',
 };
+
+function hasValidUser(user: User) {
+  return (
+    user.id.length === 36 && user.email !== null && user.username.length > 3
+  );
+}
+
+function hasValidToken(token: string) {
+  return token.length > 20;
+}
 
 const reducer = (state: AuthState, action: Action): AuthState => {
   switch (action.type) {
@@ -37,9 +47,27 @@ const reducer = (state: AuthState, action: Action): AuthState => {
 
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const user = JSON.parse(localStorage.getItem('user')) as User;
+  const token = JSON.parse(localStorage.getItem('token')) as string;
+
+  if (
+    user !== null &&
+    token !== null &&
+    hasValidUser(user) &&
+    hasValidToken(token) &&
+    state.isAuthenticated === false
+  ) {
+    dispatch({
+      type: 'login',
+      payload: {
+        user,
+        token,
+      },
+    });
+  }
   return (
     <AuthContext.Provider value={{ state, dispatch }}>
-      {state.isAuthenticated ? <HomeScreen /> : <Login />}
+      {state.isAuthenticated ? <Home /> : <Login />}
     </AuthContext.Provider>
   );
 }

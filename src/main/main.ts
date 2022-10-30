@@ -14,7 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { LoginFormState } from '../renderer/Types/DataTypes';
 import MenuBuilder from './menu';
-import { resolveHtmlPath, login } from './util';
+import { getDevices, login, logout, resolveHtmlPath } from './util';
 
 class AppUpdater {
   constructor() {
@@ -26,11 +26,39 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
+// async function getFromLocalStorage(key) {
+//   return mainWindow.webContents.executeJavaScript(
+//     `localStorage.getItem(${key})`
+//   );
+// }
+
 ipcMain.handle('login', async (event, input: LoginFormState) => {
   try {
-    const data = await login(input.email, input.password, input.device_name);
+    return await login(input.email, input.password, input.device_name);
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
 
-    return data;
+ipcMain.handle('get-devices', async (event, input) => {
+  try {
+    return await getDevices();
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+ipcMain.handle('logout', async (event, input) => {
+  try {
+    return await logout(input.token);
   } catch (error) {
     // TODO: log error
     return {
