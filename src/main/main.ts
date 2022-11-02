@@ -34,6 +34,7 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let printWindow: BrowserWindow | null = null;
 
 // async function getFromLocalStorage(key) {
 //   return mainWindow.webContents.executeJavaScript(
@@ -129,6 +130,66 @@ ipcMain.handle('getBill', async (event, input) => {
     return {
       status: 'error',
       message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+const createPrintWindow = async (url: string, options: object) => {
+  const printOptions = {
+    // ...options,
+    ...{
+      silent: false,
+      // pageSize: 'A5',
+      // printBackground: true,
+      // landscape: false,
+      // pagesPerSheet: 1,
+      // collate: false,
+      // copies: 1,
+      // // footer: 'developed by DigiSeva Pvt Ltd',
+    },
+  };
+
+  printWindow = new BrowserWindow({
+    show: true,
+    width: 1024,
+    height: 728,
+    webPreferences: {
+      sandbox: false,
+      preload: app.isPackaged
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.erb/dll/preload.js'),
+    },
+  });
+
+  printWindow.loadURL(url);
+
+  // printWindow.webContents.on('did-finish-load', () => {
+  //   printWindow.webContents.print(printOptions, (success, failureReason) => {
+  //     if (!success) {
+  //       console.log(failureReason);
+  //     } else {
+  //       console.log('Print Initiated');
+  //     }
+  //   });
+  // });
+};
+
+ipcMain.handle('print', async (event, input) => {
+  const { url, options, token } = input;
+  console.log('atta');
+
+  try {
+    await createPrintWindow(url, options);
+    return {
+      status: 'success',
+      message: null,
+      data: 'Print Initiated',
+    };
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Printer Error, contact ADMIN!' },
     };
   }
 });

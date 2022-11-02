@@ -206,6 +206,29 @@ function Home() {
     }
   };
 
+  const handlePrint = async (id: string) => {
+    console.log(id);
+
+    const response = await window['billing-app'].ipcRenderer.invoke('print', {
+      // url: `${id}`,
+      url: 'http://billing-server-app.test/bill',
+      options: {},
+      token: state.token,
+    });
+
+    console.log(response);
+
+    // if (response.status === 'error') {
+    //   // not decided
+    //   console.log();
+
+    // }
+
+    // if (response.status === 'success') {
+    //   setBillingData({ ...response.data });
+    // }
+  };
+
   return (
     // <>
     // {view == "new-bill" && <div>hello<div/>}
@@ -531,7 +554,7 @@ function Home() {
                             fontSize: '2rem',
                             fontWeight: 600,
                           }}
-                          onClick={handleBillRefresh}
+                          onClick={() => handlePrint(billingData.id)}
                         >
                           Print Bill
                         </button>
