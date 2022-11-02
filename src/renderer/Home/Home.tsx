@@ -79,12 +79,7 @@ function Home() {
 
   const handleLogout = async (event) => {
     event.preventDefault();
-
-    const logout = await window['billing-app'].ipcRenderer.invoke(
-      'logout',
-      initRequestState
-    );
-
+    await window['billing-app'].ipcRenderer.invoke('logout', initRequestState);
     dispatch({
       type: 'logout',
       payload: initLogoutState,

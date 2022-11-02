@@ -58,6 +58,8 @@ ipcMain.handle('get-devices', async (event, input) => {
     return await getDevices();
   } catch (error) {
     // TODO: log error
+    console.log(event, input);
+
     return {
       status: 'error',
       message: { error: 'Client error, contact ADMIN!' },
@@ -237,4 +239,5 @@ app
   })
   .catch((error) => {
     // TODO: log error
+    console.log(error);
   });
