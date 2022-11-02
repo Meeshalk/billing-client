@@ -14,7 +14,16 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { LoginFormState } from '../renderer/Types/DataTypes';
 import MenuBuilder from './menu';
-import { getDevices, login, logout, resolveHtmlPath } from './util';
+import {
+  addProductToBill,
+  deleteItem,
+  getBill,
+  getDevices,
+  login,
+  logout,
+  newBill,
+  resolveHtmlPath,
+} from './util';
 
 class AppUpdater {
   constructor() {
@@ -59,6 +68,60 @@ ipcMain.handle('get-devices', async (event, input) => {
 ipcMain.handle('logout', async (event, input) => {
   try {
     return await logout(input.token);
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+ipcMain.handle('newBill', async (event, input) => {
+  const { data, token } = input;
+  try {
+    return await newBill(token, data);
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+ipcMain.handle('deleteItem', async (event, input) => {
+  const { billProductId, token } = input;
+  try {
+    return await deleteItem(token, billProductId);
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+ipcMain.handle('addProductToBill', async (event, input) => {
+  const { data, billId, productId, token } = input;
+  console.log(input);
+
+  try {
+    return await addProductToBill(token, data, billId, productId);
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+ipcMain.handle('getBill', async (event, input) => {
+  const { billId, token } = input;
+  try {
+    return await getBill(token, billId);
   } catch (error) {
     // TODO: log error
     return {
