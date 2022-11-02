@@ -48,6 +48,10 @@ export async function makeRequest(data, url, method = 'get', token = null) {
     if (method === 'put') {
       axiosConfig.headers['Content-Type'] = 'application/x-www-form-urlencoded';
     }
+
+    if (method === 'delete') {
+      axiosConfig.headers['Content-Type'] = 'multipart/form-data';
+    }
   }
 
   axiosConfig.data = data;
@@ -74,6 +78,7 @@ async function login(username, password, deviceName) {
   try {
     return await makeRequest(data, 'login', 'post');
   } catch (error) {
+    console.log(error);
     return false;
   }
 }
@@ -96,4 +101,104 @@ async function getDevices() {
   }
 }
 
-export { resolveHtmlPath, getDevices, login, logout };
+/**
+ *
+ * @param token
+ * @param input (?customer_address, ?customer_mobile, ?customer_name, ?payment_type)
+ * @returns object
+ */
+async function newBill(token: string, input?: object) {
+  if (typeof input === undefined) {
+    input = {};
+  } else {
+    input = (({
+      customer_address,
+      customer_mobile,
+      customer_name,
+      payment_type,
+    }) => ({
+      customer_address,
+      customer_mobile,
+      customer_name,
+      payment_type,
+    }))(input);
+  }
+
+  try {
+    return await makeRequest(input, 'bill', 'post', token);
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+async function getBill(token: string, billId: string) {
+  try {
+    return await makeRequest({}, `bill/${billId}`, 'get', token);
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+async function deleteItem(token: string, billProductId: string) {
+  try {
+    return await makeRequest(
+      {},
+      `billing/remove_product/${billProductId}`,
+      'delete',
+      token
+    );
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+/**
+ *
+ * @param token
+ * @param billId
+ * @param productId
+ * @param input (quantity, ?rate, ?name)
+ * @returns object
+ */
+async function addProductToBill(
+  token: string,
+  input: object,
+  billId?: string,
+  productId?: string
+) {
+  let url = 'billing/add_product';
+
+  if (typeof billId !== undefined) {
+    url = `${url}/${billId}`;
+    // if (typeof productId !== undefined) {
+    //   url = `${url}/${productId}`;
+    // }
+  }
+
+  input = (({ rate, name, quantity }) => ({
+    rate,
+    name,
+    quantity,
+  }))(input);
+
+  try {
+    return await makeRequest(input, url, 'post', token);
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+export {
+  resolveHtmlPath,
+  getDevices,
+  login,
+  logout,
+  newBill,
+  deleteItem,
+  getBill,
+  addProductToBill,
+};

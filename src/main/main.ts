@@ -14,7 +14,16 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { LoginFormState } from '../renderer/Types/DataTypes';
 import MenuBuilder from './menu';
-import { getDevices, login, logout, resolveHtmlPath } from './util';
+import {
+  addProductToBill,
+  deleteItem,
+  getBill,
+  getDevices,
+  login,
+  logout,
+  newBill,
+  resolveHtmlPath,
+} from './util';
 
 class AppUpdater {
   constructor() {
@@ -25,6 +34,7 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let printWindow: BrowserWindow | null = null;
 
 // async function getFromLocalStorage(key) {
 //   return mainWindow.webContents.executeJavaScript(
@@ -49,6 +59,8 @@ ipcMain.handle('get-devices', async (event, input) => {
     return await getDevices();
   } catch (error) {
     // TODO: log error
+    console.log(event, input);
+
     return {
       status: 'error',
       message: { error: 'Client error, contact ADMIN!' },
@@ -64,6 +76,120 @@ ipcMain.handle('logout', async (event, input) => {
     return {
       status: 'error',
       message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+ipcMain.handle('newBill', async (event, input) => {
+  const { data, token } = input;
+  try {
+    return await newBill(token, data);
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+ipcMain.handle('deleteItem', async (event, input) => {
+  const { billProductId, token } = input;
+  try {
+    return await deleteItem(token, billProductId);
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+ipcMain.handle('addProductToBill', async (event, input) => {
+  const { data, billId, productId, token } = input;
+  console.log(input);
+
+  try {
+    return await addProductToBill(token, data, billId, productId);
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+ipcMain.handle('getBill', async (event, input) => {
+  const { billId, token } = input;
+  try {
+    return await getBill(token, billId);
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+const createPrintWindow = async (url: string, options: object) => {
+  const printOptions = {
+    // ...options,
+    ...{
+      silent: false,
+      // pageSize: 'A5',
+      // printBackground: true,
+      // landscape: false,
+      // pagesPerSheet: 1,
+      // collate: false,
+      // copies: 1,
+      // // footer: 'developed by DigiSeva Pvt Ltd',
+    },
+  };
+
+  printWindow = new BrowserWindow({
+    show: true,
+    width: 1024,
+    height: 728,
+    webPreferences: {
+      sandbox: false,
+      preload: app.isPackaged
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.erb/dll/preload.js'),
+    },
+  });
+
+  printWindow.loadURL(url);
+
+  // printWindow.webContents.on('did-finish-load', () => {
+  //   printWindow.webContents.print(printOptions, (success, failureReason) => {
+  //     if (!success) {
+  //       console.log(failureReason);
+  //     } else {
+  //       console.log('Print Initiated');
+  //     }
+  //   });
+  // });
+};
+
+ipcMain.handle('print', async (event, input) => {
+  const { url, options, token } = input;
+  console.log('atta');
+
+  try {
+    await createPrintWindow(url, options);
+    return {
+      status: 'success',
+      message: null,
+      data: 'Print Initiated',
+    };
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Printer Error, contact ADMIN!' },
     };
   }
 });
@@ -174,4 +300,5 @@ app
   })
   .catch((error) => {
     // TODO: log error
+    console.log(error);
   });

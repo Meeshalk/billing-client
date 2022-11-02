@@ -54,12 +54,12 @@ export default class MenuBuilder {
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
-      label: 'Electron',
+      label: 'Quick Billing App',
       submenu: [
         { label: 'Services', submenu: [] },
         { type: 'separator' },
         {
-          label: 'Hide ElectronReact',
+          label: 'Hide Quick Billing',
           accelerator: 'Command+H',
           selector: 'hide:',
         },
@@ -82,17 +82,17 @@ export default class MenuBuilder {
     const subMenuEdit: DarwinMenuItemConstructorOptions = {
       label: 'Edit',
       submenu: [
-        { label: 'Undo', accelerator: 'Command+Z', selector: 'undo:' },
-        { label: 'Redo', accelerator: 'Shift+Command+Z', selector: 'redo:' },
+        // { label: 'Undo', accelerator: 'Command+Z', selector: 'undo:' },
+        // { label: 'Redo', accelerator: 'Shift+Command+Z', selector: 'redo:' },
         { type: 'separator' },
         { label: 'Cut', accelerator: 'Command+X', selector: 'cut:' },
         { label: 'Copy', accelerator: 'Command+C', selector: 'copy:' },
         { label: 'Paste', accelerator: 'Command+V', selector: 'paste:' },
-        {
-          label: 'Select All',
-          accelerator: 'Command+A',
-          selector: 'selectAll:',
-        },
+        // {
+        //   label: 'Select All',
+        //   accelerator: 'Command+A',
+        //   selector: 'selectAll:',
+        // },
       ],
     };
     const subMenuViewDev: MenuItemConstructorOptions = {
@@ -185,7 +185,8 @@ export default class MenuBuilder {
         ? subMenuViewDev
         : subMenuViewProd;
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    // return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    return [subMenuAbout, subMenuEdit];
   }
 
   buildDefaultTemplate() {
