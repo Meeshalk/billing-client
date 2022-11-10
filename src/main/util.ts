@@ -155,6 +155,15 @@ async function deleteItem(token: string, billProductId: string) {
   }
 }
 
+async function searchProduct(token: string, query: string) {
+  try {
+    return await makeRequest({}, `product/search/${query}`, 'get', token);
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
 /**
  *
  * @param token
@@ -197,6 +206,7 @@ export {
   getDevices,
   login,
   logout,
+  searchProduct,
   newBill,
   deleteItem,
   getBill,

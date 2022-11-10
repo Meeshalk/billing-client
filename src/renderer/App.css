@@ -116,9 +116,9 @@ select {
   border: none;
 }
 
-form > input,
-form > button,
-form > select {
+form input,
+form button,
+form select {
   padding: 0.5em;
   border-radius: 0.4em;
   font-size: 1.3rem;
@@ -218,4 +218,13 @@ tfoot {
 
 tfoot th {
   font-weight: normal;
+}
+
+.react-autocomplete-input > li {
+  color: black !important;
+  font-size: 1.3rem;
+}
+
+.react-autocomplete-input > li.active {
+  color: white !important;
 }

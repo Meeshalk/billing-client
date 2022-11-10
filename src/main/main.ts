@@ -23,6 +23,7 @@ import {
   logout,
   newBill,
   resolveHtmlPath,
+  searchProduct,
 } from './util';
 
 class AppUpdater {
@@ -71,6 +72,19 @@ ipcMain.handle('get-devices', async (event, input) => {
 ipcMain.handle('logout', async (event, input) => {
   try {
     return await logout(input.token);
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+ipcMain.handle('searchProduct', async (event, input) => {
+  const { query, token } = input;
+  try {
+    return await searchProduct(token, query);
   } catch (error) {
     // TODO: log error
     return {

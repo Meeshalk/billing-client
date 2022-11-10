@@ -1,10 +1,13 @@
 /* eslint-disable react/no-array-index-key */
-import React from 'react';
+import React, { useRef } from 'react';
+import TextInput from 'react-autocomplete-input';
+import 'react-autocomplete-input/dist/bundle.css';
 import {
   LogoutPayload,
   NewBillFormState,
   Billing,
   ItemFormData,
+  Product,
 } from '../Types/DataTypes';
 import AuthContext from '../Context/AuthContext';
 
@@ -17,6 +20,7 @@ function convertErrorsToArray(errors): string[] {
 
 function Home() {
   let billDate = new Date();
+  const initSearchResult: Array<Product> = [];
   const initBillFormState: NewBillFormState = {
     customer_address: '',
     customer_mobile: '',
@@ -56,10 +60,13 @@ function Home() {
   const [billFormData, setBillFormData] = React.useState(initBillFormState);
   const [itemFormData, setItemFormData] = React.useState(initItemFormData);
   const [billingData, setBillingData] = React.useState(initBillingData);
+  const [searchResult, setSearchResult] = React.useState(initSearchResult);
+
+  const currentFocus = useRef(null);
 
   const initLogoutState: LogoutPayload = { user: state.user };
   const initRequestState = { token: state.token };
-  console.log(view, billingData, billFormData);
+  console.log(view, searchResult);
 
   const toggleView = (to: string) => {
     if (
@@ -94,6 +101,44 @@ function Home() {
   };
 
   const handleItemFormInputChange = (event) => {
+    setItemFormData({
+      ...itemFormData,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  React.useEffect(() => {
+    if (currentFocus.current !== null) {
+      currentFocus.current.focus();
+    }
+  }, [itemFormData]);
+
+  const handleItemAutocompleteSelect = (value) => {
+    setItemFormData({
+      ...itemFormData,
+      name: value,
+    });
+  };
+
+  const handleSearchProduct = async (event) => {
+    event.preventDefault();
+    setSearchResult(initSearchResult);
+
+    const response = await window['billing-app'].ipcRenderer.invoke(
+      'searchProduct',
+      {
+        query: event.target.value,
+        token: state.token,
+      }
+    );
+
+    if (response.status === 'error') {
+      console.log('no product!');
+    }
+
+    if (response.status === 'success') {
+      setSearchResult(response.data.data);
+    }
     setItemFormData({
       ...itemFormData,
       [event.target.name]: event.target.value,
@@ -211,7 +256,7 @@ function Home() {
 
     const response = await window['billing-app'].ipcRenderer.invoke('print', {
       // url: `${id}`,
-      url: 'http://billing-server-app.test/bill',
+      url: `http://billing-server-app.test/print/${id}`,
       options: {},
       token: state.token,
     });
@@ -345,19 +390,36 @@ function Home() {
         {view === 'billing' && billingData.id !== '' && (
           <>
             <form style={{ padding: '10px' }} onSubmit={handleAddItem}>
-              <input
+              <TextInput
+                Component="input"
+                trigger=""
+                options={[...new Set(searchResult.map((a) => a.name))]}
+                placeholder="Item Name"
+                style={{ flexGrow: 1 }}
+                type="text"
+                name="name"
+                spacer=""
+                regex=""
+                onSelect={handleItemAutocompleteSelect}
+                spaceRemover={[]}
+                // onChange={handleItemFormInputChange}
+                onInput={handleSearchProduct}
+              />
+              {/* <input
                 style={{ flexGrow: 1 }}
                 type="text"
                 name="name"
                 onChange={handleItemFormInputChange}
+                onInput={handleSearchProduct}
                 placeholder="Item Name"
-              />{' '}
+              />{' '} */}
               &nbsp;
               <input
                 type="number"
                 name="quantity"
                 onChange={handleItemFormInputChange}
                 placeholder="Quantity"
+                ref={currentFocus}
               />
               &nbsp;
               <input
