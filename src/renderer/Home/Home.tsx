@@ -252,7 +252,7 @@ function Home() {
 
   const handlePrint = async (id: string) => {
     const response = await window['billing-app'].ipcRenderer.invoke('print', {
-      url: `http://billing-server-app.test/print/${id}`,
+      url: `http://192.168.0.10/print/${id}`,
       options: {},
       token: state.token,
     });
