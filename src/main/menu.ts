@@ -125,12 +125,26 @@ export default class MenuBuilder {
       label: 'View',
       submenu: [
         {
+          label: 'Reload',
+          accelerator: 'Command+R',
+          click: () => {
+            this.mainWindow.webContents.reload();
+          },
+        },
+        {
           label: 'Toggle Full Screen',
           accelerator: 'Ctrl+Command+F',
           click: () => {
             this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
           },
         },
+        // {
+        //   label: 'Toggle &Developer Tools',
+        //   accelerator: 'Alt+Ctrl+I',
+        //   click: () => {
+        //     this.mainWindow.webContents.toggleDevTools();
+        //   },
+        // },
       ],
     };
     const subMenuWindow: DarwinMenuItemConstructorOptions = {
@@ -249,25 +263,25 @@ export default class MenuBuilder {
                 },
               ],
       },
-      {
-        label: 'Help',
-        submenu: [
-          {
-            label: 'About',
-            click() {
-              shell.openExternal('https://electronjs.org');
-            },
-          },
-          {
-            label: 'Contact Support',
-            click() {
-              shell.openExternal(
-                'https://github.com/electron/electron/tree/main/docs#readme'
-              );
-            },
-          },
-        ],
-      },
+      // {
+      //   label: 'Help',
+      //   submenu: [
+      //     {
+      //       label: 'About',
+      //       click() {
+      //         shell.openExternal('https://electronjs.org');
+      //       },
+      //     },
+      //     {
+      //       label: 'Contact Support',
+      //       click() {
+      //         shell.openExternal(
+      //           'https://github.com/electron/electron/tree/main/docs#readme'
+      //         );
+      //       },
+      //     },
+      //   ],
+      // },
     ];
 
     return templateDefault;

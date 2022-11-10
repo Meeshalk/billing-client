@@ -44,8 +44,8 @@ export type NewBillFormState = {
 
 export type ItemFormData = {
   name: string;
-  quantity: number;
-  rate: number;
+  quantity: string;
+  rate: string;
   isSubmitting: boolean;
   errorMessage: Array<string>;
 };

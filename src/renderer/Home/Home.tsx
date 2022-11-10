@@ -32,8 +32,8 @@ function Home() {
 
   const initItemFormData: ItemFormData = {
     name: '',
-    quantity: 0,
-    rate: 0,
+    quantity: '',
+    rate: '',
     isSubmitting: false,
     errorMessage: [],
   };
@@ -61,8 +61,6 @@ function Home() {
   const [itemFormData, setItemFormData] = React.useState(initItemFormData);
   const [billingData, setBillingData] = React.useState(initBillingData);
   const [searchResult, setSearchResult] = React.useState(initSearchResult);
-
-  const currentFocus = useRef(null);
 
   const initLogoutState: LogoutPayload = { user: state.user };
   const initRequestState = { token: state.token };
@@ -106,12 +104,6 @@ function Home() {
     });
   };
 
-  // React.useEffect(() => {
-  //   if (currentFocus.current !== null) {
-  //     currentFocus.current.focus();
-  //   }
-  // }, [itemFormData]);
-
   const handleItemAutocompleteSelect = (value) => {
     setItemFormData({
       ...itemFormData,
@@ -121,6 +113,10 @@ function Home() {
 
   const handleSearchProduct = async (event) => {
     event.preventDefault();
+    setItemFormData({
+      ...itemFormData,
+      name: event.target.value,
+    });
     setSearchResult(initSearchResult);
 
     const response = await window['billing-app'].ipcRenderer.invoke(
@@ -138,10 +134,6 @@ function Home() {
     if (response.status === 'success') {
       setSearchResult(response.data.data);
     }
-    setItemFormData({
-      ...itemFormData,
-      [event.target.name]: event.target.value,
-    });
   };
 
   const handleNewBill = async (event) => {
@@ -192,19 +184,17 @@ function Home() {
 
     if (response.status === 'success') {
       setBillingData({ ...response.data });
+      setItemFormData({ ...initItemFormData });
     }
   };
 
   const handleAddItem = async (event) => {
     event.preventDefault();
-    let errors = [];
-    let isSubmitting = true;
-
-    setItemFormData({
-      ...itemFormData,
-      isSubmitting,
-      errorMessage: errors,
+    ['quantity', 'name', 'rate'].forEach((name) => {
+      document.getElementById(`${name}-input`).style.border = 'none';
     });
+    // let errors = [];
+    let isSubmitting = true;
     const response = await window['billing-app'].ipcRenderer.invoke(
       'addProductToBill',
       {
@@ -214,23 +204,49 @@ function Home() {
         token: state.token,
       }
     );
+
     if (response.status === 'error') {
       // not decided
-      errors = convertErrorsToArray(response.message);
+      // errors = convertErrorsToArray(response.message);
+      const errorInputs = Object.keys(response.message);
+      errorInputs.forEach((name) => {
+        const element = document.getElementById(`${name}-input`);
+        element.style.border = '1px solid rgba(255, 73, 73, 0.874)';
+        // element.style.outline = 'none';
+      });
       isSubmitting = false;
       setItemFormData({
         ...itemFormData,
         isSubmitting,
-        errorMessage: errors,
+        // errorMessage: errors,
       });
     }
 
     if (response.status === 'success') {
       setBillingData({ ...response.data });
-      setItemFormData(initItemFormData);
-      event.target.reset();
+      setItemFormData({
+        ...initItemFormData,
+        name: '',
+        quantity: '',
+        rate: '',
+      });
+      setTimeout(() => {
+        event.target.childNodes.forEach((node) => {
+          if (node.name !== undefined && node.name.length > 1) {
+            node.value = '';
+          }
+
+          if (node.name === 'name') {
+            node.focus();
+          }
+        });
+      }, 200);
     }
   };
+
+  // React.useEffect(() => {
+  //   setItemFormData(initItemFormData);
+  // }, [initItemFormData]);
 
   const handleItemDelete = async (billProductId: string) => {
     const response = await window['billing-app'].ipcRenderer.invoke(
@@ -400,6 +416,7 @@ function Home() {
                 onInput={handleSearchProduct}
                 offsetX={100}
                 offsetY={-26}
+                id="name-input"
               />
               &nbsp;
               <input
@@ -407,20 +424,21 @@ function Home() {
                 name="quantity"
                 onChange={handleItemFormInputChange}
                 placeholder="Quantity"
-                ref={currentFocus}
+                id="quantity-input"
               />
               &nbsp;
               <input
                 type="number"
                 name="rate"
                 onChange={handleItemFormInputChange}
-                placeholder="Price"
+                placeholder="Rate"
+                id="rate-input"
               />
               &nbsp; &nbsp;
               <input
                 type="submit"
                 style={{
-                  backgroundColor: 'rgb(62, 165, 255)',
+                  backgroundColor: 'rgb(170 255 227 / 90%)',
                   outline: 0,
                 }}
                 value="Add Item"
@@ -526,6 +544,7 @@ function Home() {
                                     <button
                                       type="button"
                                       className="btn-small-round"
+                                      tabIndex={-1}
                                       onClick={() =>
                                         handleItemDelete(product.pivot?.id)
                                       }

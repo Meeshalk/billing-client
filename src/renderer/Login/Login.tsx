@@ -67,7 +67,7 @@ const Login = () => {
     );
 
     if (data.status === 'error') {
-      errors = convertErrorsToArray(JSON.parse(data.message));
+      errors = convertErrorsToArray(data.message);
       isSubmitting = false;
     }
 
