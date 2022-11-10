@@ -84,15 +84,15 @@ export default class MenuBuilder {
       submenu: [
         // { label: 'Undo', accelerator: 'Command+Z', selector: 'undo:' },
         // { label: 'Redo', accelerator: 'Shift+Command+Z', selector: 'redo:' },
-        { type: 'separator' },
+        // { type: 'separator' },
         { label: 'Cut', accelerator: 'Command+X', selector: 'cut:' },
         { label: 'Copy', accelerator: 'Command+C', selector: 'copy:' },
         { label: 'Paste', accelerator: 'Command+V', selector: 'paste:' },
-        // {
-        //   label: 'Select All',
-        //   accelerator: 'Command+A',
-        //   selector: 'selectAll:',
-        // },
+        {
+          label: 'Select All',
+          accelerator: 'Command+A',
+          selector: 'selectAll:',
+        },
       ],
     };
     const subMenuViewDev: MenuItemConstructorOptions = {
@@ -186,7 +186,7 @@ export default class MenuBuilder {
         : subMenuViewProd;
 
     // return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
-    return [subMenuAbout, subMenuEdit];
+    return [subMenuAbout, subMenuEdit, subMenuView];
   }
 
   buildDefaultTemplate() {

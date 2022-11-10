@@ -23,7 +23,7 @@ const axiosConfig: AxiosRequestConfig = {
   headers: defaultHeaders,
   method: 'post',
   data: {},
-  baseURL: 'http://billing-server-app.test/api/',
+  baseURL: 'http://192.168.0.10/api/',
   // httpAgent: 'billing-client-electron-version',
   // httpsAgent: 'billing-client-electron-version-secure',
 };
@@ -155,6 +155,15 @@ async function deleteItem(token: string, billProductId: string) {
   }
 }
 
+async function searchProduct(token: string, query: string) {
+  try {
+    return await makeRequest({}, `product/search/${query}`, 'get', token);
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
 /**
  *
  * @param token
@@ -197,6 +206,7 @@ export {
   getDevices,
   login,
   logout,
+  searchProduct,
   newBill,
   deleteItem,
   getBill,

@@ -35,7 +35,7 @@ const Login = () => {
     }
 
     if (response.status === 'success') {
-      setDeviceList(response.data);
+      setDeviceList([response.data[0]]);
     }
   };
 
@@ -47,6 +47,7 @@ const Login = () => {
     setLoginFormData({
       ...loginFormData,
       [event.target.name]: event.target.value,
+      device_name: deviceList[0].name,
     });
   };
 
@@ -66,7 +67,7 @@ const Login = () => {
     );
 
     if (data.status === 'error') {
-      errors = convertErrorsToArray(data.message);
+      errors = convertErrorsToArray(JSON.parse(data.message));
       isSubmitting = false;
     }
 
@@ -118,6 +119,7 @@ const Login = () => {
                 name="device_name"
                 id="device_name"
                 defaultValue="Select Device"
+                style={{ display: 'none' }}
                 onChange={handleInputChange}
               >
                 <option disabled>Select Device</option>
@@ -141,14 +143,14 @@ const Login = () => {
               </div>
 
               {loginFormData.errorMessage.length > 0 && (
-                <span className="form-error">
+                <div className="form-error">
                   <p style={{ textAlign: 'center' }}>Input Errors</p>
                   <ul>
                     {loginFormData.errorMessage.map((error, index) => (
                       <li key={index}>{error}</li>
                     ))}
                   </ul>
-                </span>
+                </div>
               )}
             </form>
           </div>

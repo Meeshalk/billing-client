@@ -23,6 +23,7 @@ import {
   logout,
   newBill,
   resolveHtmlPath,
+  searchProduct,
 } from './util';
 
 class AppUpdater {
@@ -58,9 +59,6 @@ ipcMain.handle('get-devices', async (event, input) => {
   try {
     return await getDevices();
   } catch (error) {
-    // TODO: log error
-    console.log(event, input);
-
     return {
       status: 'error',
       message: { error: 'Client error, contact ADMIN!' },
@@ -71,6 +69,19 @@ ipcMain.handle('get-devices', async (event, input) => {
 ipcMain.handle('logout', async (event, input) => {
   try {
     return await logout(input.token);
+  } catch (error) {
+    // TODO: log error
+    return {
+      status: 'error',
+      message: { error: 'Client error, contact ADMIN!' },
+    };
+  }
+});
+
+ipcMain.handle('searchProduct', async (event, input) => {
+  const { query, token } = input;
+  try {
+    return await searchProduct(token, query);
   } catch (error) {
     // TODO: log error
     return {
@@ -108,7 +119,6 @@ ipcMain.handle('deleteItem', async (event, input) => {
 
 ipcMain.handle('addProductToBill', async (event, input) => {
   const { data, billId, productId, token } = input;
-  console.log(input);
 
   try {
     return await addProductToBill(token, data, billId, productId);
@@ -176,7 +186,6 @@ const createPrintWindow = async (url: string, options: object) => {
 
 ipcMain.handle('print', async (event, input) => {
   const { url, options, token } = input;
-  console.log('atta');
 
   try {
     await createPrintWindow(url, options);
