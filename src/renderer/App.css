@@ -59,7 +59,8 @@ button,
   cursor: pointer;
 }
 
-button:hover {
+button:hover,
+input[type='submit']:hover {
   transform: scale(1.05);
   opacity: 1;
 }

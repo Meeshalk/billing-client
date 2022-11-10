@@ -66,7 +66,6 @@ function Home() {
 
   const initLogoutState: LogoutPayload = { user: state.user };
   const initRequestState = { token: state.token };
-  console.log(view, searchResult);
 
   const toggleView = (to: string) => {
     if (
@@ -107,11 +106,11 @@ function Home() {
     });
   };
 
-  React.useEffect(() => {
-    if (currentFocus.current !== null) {
-      currentFocus.current.focus();
-    }
-  }, [itemFormData]);
+  // React.useEffect(() => {
+  //   if (currentFocus.current !== null) {
+  //     currentFocus.current.focus();
+  //   }
+  // }, [itemFormData]);
 
   const handleItemAutocompleteSelect = (value) => {
     setItemFormData({
@@ -252,16 +251,11 @@ function Home() {
   };
 
   const handlePrint = async (id: string) => {
-    console.log(id);
-
     const response = await window['billing-app'].ipcRenderer.invoke('print', {
-      // url: `${id}`,
       url: `http://billing-server-app.test/print/${id}`,
       options: {},
       token: state.token,
     });
-
-    console.log(response);
 
     // if (response.status === 'error') {
     //   // not decided
@@ -401,18 +395,12 @@ function Home() {
                 spacer=""
                 regex=""
                 onSelect={handleItemAutocompleteSelect}
-                spaceRemover={[]}
+                spaceRemovers={[]}
                 // onChange={handleItemFormInputChange}
                 onInput={handleSearchProduct}
+                offsetX={100}
+                offsetY={-26}
               />
-              {/* <input
-                style={{ flexGrow: 1 }}
-                type="text"
-                name="name"
-                onChange={handleItemFormInputChange}
-                onInput={handleSearchProduct}
-                placeholder="Item Name"
-              />{' '} */}
               &nbsp;
               <input
                 type="number"
